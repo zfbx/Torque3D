@@ -276,6 +276,7 @@ S32 gObjectCopyFailures = -1;
 bool alwaysUseDebugOutput = true;
 bool useTimestamp = false;
 bool useRealTimestamp = false;
+bool showType = false;
 
 ConsoleFunctionGroupBegin( Clipboard, "Miscellaneous functions to control the clipboard and clear the console.");
 
@@ -377,6 +378,10 @@ void init()
 
    // controls whether a real date and time is prepended to every console message
    addVariable("Con::useRealTimestamp", TypeBool, &useRealTimestamp, "If true a date and time will be prepended to every console message.\n"
+      "@ingroup Console\n");
+
+   // controls whether a real date and time is prepended to every console message
+   addVariable("Con::showType", TypeBool, &showType, "If true will prepend message with type of log message it is.\n"
       "@ingroup Console\n");
 
    // Plug us into the journaled console input signal.
@@ -631,7 +636,11 @@ static void _printf(ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, co
       offset += dSprintf(buffer + offset, sizeof(buffer) - offset, "[+%4d.%03d]", U32(curTime * 0.001), curTime % 1000);
    }
 
-   if (useTimestamp || useRealTimestamp) {
+   if (showType) {
+      offset += dSprintf(buffer + offset, sizeof(buffer) - offset, "[%s]", type);
+   }
+
+   if (useTimestamp || useRealTimestamp || showType) {
       offset += dSprintf(buffer + offset, sizeof(buffer) - offset, " ");
    }
 
